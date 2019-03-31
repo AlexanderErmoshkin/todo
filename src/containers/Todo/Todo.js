@@ -12,6 +12,7 @@ class Todo extends Component {
 
     componentDidMount() {
         console.log('[Todo] componentDidMount');
+        this.props.onTodoFetch();
     }
 
     todoInputHandler = event => {
@@ -36,6 +37,9 @@ class Todo extends Component {
         const todoList = this.props.todos
             ? <List todos={this.props.todos} toggleHandler={this.todoToggleHandler} deleteHandler={this.todoDeleteHandler}/>
             : null;
+        const footer = this.props.todos.length > 0
+            ? <Footer itemsCount={0}/>
+            : null;
         return (
             <React.Fragment>
                 <Header
@@ -47,7 +51,7 @@ class Todo extends Component {
                     <label htmlFor="toggle-all">Mark all as complete</label>
                     {todoList}
                 </section>
-                <Footer itemsCount={0}/>
+                {footer}
             </React.Fragment>
         );
     }
@@ -65,7 +69,8 @@ const mapDispatchToProps = dispatch => {
         onTodoAdd: todoName => dispatch(actions.todoAdd(todoName)),
         onTodoNameChanged: todoName => dispatch(actions.todoNameChanged(todoName)),
         onTodoToggle: (id, completed) => dispatch(actions.todoToggle(id, completed)),
-        onTodoDelete: id => dispatch(actions.todoDelete(id))
+        onTodoDelete: id => dispatch(actions.todoDelete(id)),
+        onTodoFetch: () => dispatch(actions.todoFetch())
     };
 };
 

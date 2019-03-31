@@ -82,3 +82,35 @@ export const todoDeleteFail = error => {
         payload: error
     };
 };
+
+export const todoFetch = () => {
+    return dispatch => {
+        dispatch(todoFetchStart());
+        axios.get('todos.json').then(response => {
+            console.log(response);
+            dispatch(todoFetchSuccess(response.data));
+        }).catch(error => {
+            dispatch(todoFetchFail(error));
+        });
+    }
+};
+
+export const todoFetchStart = () => {
+    return {
+        type: actionTypes.TODO_FETCH_START
+    };
+};
+
+export const todoFetchSuccess = todos => {
+    return {
+        type: actionTypes.TODO_FETCH_SUCCESS,
+        payload: todos
+    };
+};
+
+export const todoFetchFail = error => {
+    return {
+        type: actionTypes.TODO_FETCH_FAIL,
+        payload: error
+    };
+};

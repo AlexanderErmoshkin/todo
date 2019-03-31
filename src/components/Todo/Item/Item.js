@@ -8,6 +8,7 @@ const item = props => (
                 className="toggle"
                 type="checkbox"
                 onChange={props.toggle}
+                checked={props.completed}
                 value={props.completed} />
             <label>{props.name}</label>
             <button className="destroy" onClick={props.delete} data-id={props.id}></button>
