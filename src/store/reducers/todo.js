@@ -6,12 +6,6 @@ const todoFetchStart = state => {
 };
 
 const todoFetchSuccess = (state, action) => {
-    let count = 0;
-    Object.keys(action.payload).forEach(id => {
-        if (!action.payload[id].completed) {
-            count++;
-        }
-    });
     return updateObject(state, {
         loading: false,
         error: null,
@@ -22,7 +16,9 @@ const todoFetchSuccess = (state, action) => {
                 name: action.payload[id].name
             };
         }),
-        itemsLeft: count
+        itemsLeft: Object.keys(action.payload).reduce((count, id) => {
+            return action.payload[id].completed ? count : count + 1
+        }, 0)
     });
 };
 
@@ -109,8 +105,33 @@ const todoDeleteCompletedFail = (state, action) => {
     });
 };
 
-const todoDeleteCompletedStart = (state, action) => {
+const todoDeleteCompletedStart = state => {
     return updateObject(state, {loading: true});
+};
+
+const todoToggleMassStart = state => {
+    return updateObject(state, {loading: true});
+};
+
+const todoToggleMassSuccess = (state, action) => {
+    return updateObject(state, {
+        loading: false,
+        error: null,
+        todos: [...state.todos].map(todo => {
+            todo.completed = action.payload;
+            return todo;
+        }),
+        itemsLeft: state.todos.reduce((count, todo) => {
+            return todo.completed ? count : count + 1;
+        }, 0)
+    });
+};
+
+const todoToggleMassFail = (state, action) => {
+    return updateObject(state, {
+        loading: false,
+        error: action.payload
+    });
 };
 
 const initialState = {
@@ -136,6 +157,9 @@ const todoReducer = (state = initialState, action) => {
         case actionTypes.TODO_DELETE_COMPLETED_START: return todoDeleteCompletedStart(state, action);
         case actionTypes.TODO_DELETE_COMPLETED_SUCCESS: return todoDeleteCompletedSuccess(state, action);
         case actionTypes.TODO_DELETE_COMPLETED_FAIL: return todoDeleteCompletedFail(state, action);
+        case actionTypes.TODO_TOGGLE_MASS_START: return todoToggleMassStart(state);
+        case actionTypes.TODO_TOGGLE_MASS_SUCCESS: return todoToggleMassSuccess(state, action);
+        case actionTypes.TODO_TOGGLE_MASS_FAIL: return todoToggleMassFail(state, action);
         default: return state;
     }
 };

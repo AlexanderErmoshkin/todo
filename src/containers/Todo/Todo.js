@@ -7,6 +7,7 @@ import List from '../../components/Todo/List/List';
 import * as actions from '../../store/actions/index';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../axios';
+import ToggleMass from '../../components/Todo/ToggleMass/ToggleMass';
 
 class Todo extends Component {
 
@@ -43,12 +44,21 @@ class Todo extends Component {
         this.props.onTodoCompletedDelete(ids);
     };
 
+    todoToggleMassHandler = () => {
+        this.props.onTodoToggleMass(this.props.todos, this.props.itemsLeft > 0);
+    };
+
     render() {
-        const todoList = this.props.todos
-            ? <List
-                todos={this.props.todos}
-                toggleHandler={this.todoToggleHandler}
-                deleteHandler={this.todoDeleteHandler}/>
+        const main = this.props.todos.length
+            ? (
+                <React.Fragment>
+                    <ToggleMass checked={this.props.itemsLeft === 0} handler={this.todoToggleMassHandler}/>
+                    <List
+                        todos={this.props.todos}
+                        toggleHandler={this.todoToggleHandler}
+                        deleteHandler={this.todoDeleteHandler}/>
+                </React.Fragment>
+            )
             : null;
         const footer = this.props.todos.length > 0
             ? <Footer
@@ -64,9 +74,7 @@ class Todo extends Component {
                     inputValue={this.props.todoName}
                     inputChanged={this.inputChangedHandler} />
                 <section className="main">
-                    <input id="toggle-all" className="toggle-all" type="checkbox" />
-                    <label htmlFor="toggle-all">Mark all as complete</label>
-                    {todoList}
+                    {main}
                 </section>
                 {footer}
             </React.Fragment>
@@ -90,7 +98,8 @@ const mapDispatchToProps = dispatch => {
         onTodoToggle: (id, completed) => dispatch(actions.todoToggle(id, completed)),
         onTodoDelete: id => dispatch(actions.todoDelete(id)),
         onTodoFetch: () => dispatch(actions.todoFetch()),
-        onTodoCompletedDelete: ids => dispatch(actions.todoDeleteCompleted(ids))
+        onTodoCompletedDelete: ids => dispatch(actions.todoDeleteCompleted(ids)),
+        onTodoToggleMass: (todos, isCompleted) => dispatch(actions.todoToggleMass(todos, isCompleted))
     };
 };
 

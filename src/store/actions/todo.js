@@ -11,14 +11,14 @@ export const todoAdd = todoName => {
     }
 };
 
-export const todoAddSuccess = (id, todo) => {
+const todoAddSuccess = (id, todo) => {
     return {
         type: actionTypes.TODO_ADD_SUCCESS,
         payload: {id: id, name: todo, completed: false}
     };
 };
 
-export const todoAddFail = error => {
+const todoAddFail = error => {
     return {
         type: actionTypes.TODO_ADD_FAIL,
         payload: error
@@ -43,7 +43,7 @@ export const todoToggle = (id, completed) => {
     };
 };
 
-export const todoToggleSuccess = (id, completed) => {
+const todoToggleSuccess = (id, completed) => {
     return {
         type: actionTypes.TODO_TOGGLE_SUCCESS,
         payload: {
@@ -53,7 +53,7 @@ export const todoToggleSuccess = (id, completed) => {
     };
 };
 
-export const todoToggleFail = error => {
+const todoToggleFail = error => {
     return {
         type: actionTypes.TODO_TOGGLE_FAIL,
         payload: error
@@ -70,14 +70,14 @@ export const todoDelete = id => {
     };
 };
 
-export const todoDeleteSuccess = id => {
+const todoDeleteSuccess = id => {
     return {
         type: actionTypes.TODO_DELETE_SUCCESS,
         payload: id
     };
 };
 
-export const todoDeleteFail = error => {
+const todoDeleteFail = error => {
     return {
         type: actionTypes.TODO_DELETE_FAIL,
         payload: error
@@ -95,20 +95,20 @@ export const todoFetch = () => {
     }
 };
 
-export const todoFetchStart = () => {
+const todoFetchStart = () => {
     return {
         type: actionTypes.TODO_FETCH_START
     };
 };
 
-export const todoFetchSuccess = todos => {
+const todoFetchSuccess = todos => {
     return {
         type: actionTypes.TODO_FETCH_SUCCESS,
         payload: todos
     };
 };
 
-export const todoFetchFail = error => {
+const todoFetchFail = error => {
     return {
         type: actionTypes.TODO_FETCH_FAIL,
         payload: error
@@ -130,22 +130,57 @@ export const todoDeleteCompleted = ids => {
     };
 };
 
-export const todoDeleteCompletedStart = () => {
+const todoDeleteCompletedStart = () => {
     return {
         type: actionTypes.TODO_DELETE_COMPLETED_START
     };
 };
 
-export const todoDeleteCompletedSuccess = ids => {
+const todoDeleteCompletedSuccess = ids => {
     return {
         type: actionTypes.TODO_DELETE_COMPLETED_SUCCESS,
         payload: ids
     };
 };
 
-export const todoDeleteCompletedFail = error => {
+const todoDeleteCompletedFail = error => {
     return {
         type: actionTypes.TODO_DELETE_COMPLETED_FAIL,
+        payload: error
+    };
+};
+
+export const todoToggleMass = (todos, isCompleted) => {
+    return dispatch => {
+        dispatch(todoToggleMassStart());
+        const requests = [];
+        todos.forEach(todo => requests.push(
+            axios.patch('todos/' + todo.id + '.json', {completed: isCompleted})
+        ));
+        Promise.all(requests).then(([...responses]) => {
+            dispatch(todoToggleMassSuccess(isCompleted));
+        }).catch(error => {
+            dispatch(todoToggleMassFail(error));
+        });
+    };
+};
+
+const todoToggleMassStart = () => {
+    return {
+        type: actionTypes.TODO_TOGGLE_MASS_START
+    };
+};
+
+const todoToggleMassSuccess = isCompleted => {
+    return {
+        type: actionTypes.TODO_TOGGLE_MASS_SUCCESS,
+        payload: isCompleted
+    };
+};
+
+const todoToggleMassFail = error => {
+    return {
+        type: actionTypes.TODO_TOGGLE_MASS_FAIL,
         payload: error
     };
 };

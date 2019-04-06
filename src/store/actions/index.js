@@ -1,1 +1,3 @@
-export { todoAdd, todoNameChanged, todoToggle, todoDelete, todoFetch, todoDeleteCompleted } from "./todo";
+export {
+    todoAdd, todoNameChanged, todoToggle, todoDelete, todoFetch, todoDeleteCompleted, todoToggleMass
+} from "./todo";
