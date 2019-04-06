@@ -33,12 +33,22 @@ class Todo extends Component {
         this.props.onTodoDelete(event.target.dataset.id);
     };
 
+    todoDeleteCompletedHandler = () => {
+        this.props.onTodoCompletedDelete(ids);
+    };
+
     render() {
         const todoList = this.props.todos
-            ? <List todos={this.props.todos} toggleHandler={this.todoToggleHandler} deleteHandler={this.todoDeleteHandler}/>
+            ? <List
+                todos={this.props.todos}
+                toggleHandler={this.todoToggleHandler}
+                deleteHandler={this.todoDeleteHandler}/>
             : null;
         const footer = this.props.todos.length > 0
-            ? <Footer itemsCount={0}/>
+            ? <Footer
+                uncheckedCount={this.props.itemsLeft}
+                checkedCount={this.props.todos.length - this.props.itemsLeft}
+                deleteCompleted={this.todoDeleteCompletedHandler} />
             : null;
         return (
             <React.Fragment>
@@ -60,7 +70,8 @@ class Todo extends Component {
 const mapStateToProps = state => {
     return {
         todos: state.todo.todos,
-        todoName: state.todo.todoName
+        todoName: state.todo.todoName,
+        itemsLeft: state.todo.itemsLeft,
     };
 };
 
@@ -70,7 +81,8 @@ const mapDispatchToProps = dispatch => {
         onTodoNameChanged: todoName => dispatch(actions.todoNameChanged(todoName)),
         onTodoToggle: (id, completed) => dispatch(actions.todoToggle(id, completed)),
         onTodoDelete: id => dispatch(actions.todoDelete(id)),
-        onTodoFetch: () => dispatch(actions.todoFetch())
+        onTodoFetch: () => dispatch(actions.todoFetch()),
+        onTodoCompletedDelete: ids => dispatch(actions.todoDeleteCompleted(ids))
     };
 };
 

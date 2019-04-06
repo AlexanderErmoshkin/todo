@@ -4,11 +4,14 @@ import Filters from '../../Filters/Filters';
 import Counter from '../Counter/Counter';
 
 const footer = props => {
+    const clearBtn = props.checkedCount > 0
+        ? <button className="clear-completed" onClick={props.deleteCompleted}>Clear completed</button>
+        : null;
     return (
         <footer className="footer">
-            <Counter count={0}/>
+            <Counter count={props.uncheckedCount}/>
             <Filters/>
-            <button className="clear-completed">Clear completed</button>
+            {clearBtn}
         </footer>
     );
 };

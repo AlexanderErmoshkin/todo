@@ -63,16 +63,17 @@ export const todoToggleFail = error => {
 export const todoDelete = id => {
     return dispatch => {
         axios.delete('todos/' + id + '.json').then(() => {
-            dispatch(todoDeleteSuccess());
+            dispatch(todoDeleteSuccess(id));
         }).catch((error) => {
             dispatch(todoDeleteFail(error));
         });
     };
 };
 
-export const todoDeleteSuccess = () => {
+export const todoDeleteSuccess = id => {
     return {
-        type: actionTypes.TODO_DELETE_SUCCESS
+        type: actionTypes.TODO_DELETE_SUCCESS,
+        payload: id
     };
 };
 
@@ -87,7 +88,6 @@ export const todoFetch = () => {
     return dispatch => {
         dispatch(todoFetchStart());
         axios.get('todos.json').then(response => {
-            console.log(response);
             dispatch(todoFetchSuccess(response.data));
         }).catch(error => {
             dispatch(todoFetchFail(error));
@@ -111,6 +111,41 @@ export const todoFetchSuccess = todos => {
 export const todoFetchFail = error => {
     return {
         type: actionTypes.TODO_FETCH_FAIL,
+        payload: error
+    };
+};
+
+export const todoDeleteCompleted = ids => {
+    const requests = [];
+    ids.map(id => {
+        return requests.push(axios.delete('todos/' + id + '.json'));
+    });
+    return dispatch => {
+        dispatch(todoDeleteCompletedStart());
+        Promise.all(requests).then(([...responses]) => {
+            dispatch(todoDeleteCompletedSuccess(ids));
+        }).catch(error => {
+            dispatch(todoDeleteCompletedFail(error));
+        });
+    };
+};
+
+export const todoDeleteCompletedStart = () => {
+    return {
+        type: actionTypes.TODO_DELETE_COMPLETED_START
+    };
+};
+
+export const todoDeleteCompletedSuccess = ids => {
+    return {
+        type: actionTypes.TODO_DELETE_COMPLETED_SUCCESS,
+        payload: ids
+    };
+};
+
+export const todoDeleteCompletedFail = error => {
+    return {
+        type: actionTypes.TODO_DELETE_COMPLETED_FAIL,
         payload: error
     };
 };
