@@ -8,6 +8,7 @@ const input = props => (
         onKeyDown={props.todoAdd}
         value={props.value}
         onChange={props.changed}
+        disabled={props.disabled}
     />
 );
 

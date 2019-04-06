@@ -10,6 +10,7 @@ const header = props => (
             placeHolder="What needs to be done?"
             autoFocus
             value={props.inputValue}
+            disabled={props.loading}
             todoAdd={props.todoAdd}
             changed={props.inputChanged} />
     </header>

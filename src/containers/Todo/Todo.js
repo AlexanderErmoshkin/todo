@@ -16,7 +16,7 @@ class Todo extends Component {
     }
 
     todoInputHandler = event => {
-        if (event.keyCode === 13) {
+        if (event.keyCode === 13 && this.props.todoName !== '') {
             this.props.onTodoAdd(event.target.value);
         }
     };
@@ -34,6 +34,12 @@ class Todo extends Component {
     };
 
     todoDeleteCompletedHandler = () => {
+        const ids = [];
+        this.props.todos.forEach(todo => {
+            if (todo.completed) {
+                ids.push(todo.id);
+            }
+        });
         this.props.onTodoCompletedDelete(ids);
     };
 
@@ -53,6 +59,7 @@ class Todo extends Component {
         return (
             <React.Fragment>
                 <Header
+                    loading={this.props.loading}
                     todoAdd={this.todoInputHandler}
                     inputValue={this.props.todoName}
                     inputChanged={this.inputChangedHandler} />
@@ -72,6 +79,7 @@ const mapStateToProps = state => {
         todos: state.todo.todos,
         todoName: state.todo.todoName,
         itemsLeft: state.todo.itemsLeft,
+        loading: state.todo.loading
     };
 };
 
