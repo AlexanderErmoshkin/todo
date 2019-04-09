@@ -1,5 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from "../../util";
+import {filterActions} from "../actions/actionTypes";
 
 const todoFetchStart = state => {
     return updateObject(state, {loading: true});
@@ -13,7 +14,8 @@ const todoFetchSuccess = (state, action) => {
             return {
                 id: id,
                 completed: action.payload[id].completed,
-                name: action.payload[id].name
+                name: action.payload[id].name,
+                hidden: false
             };
         }),
         itemsLeft: Object.keys(action.payload).reduce((count, id) => {
@@ -50,6 +52,7 @@ const todoToggleSuccess = (state, action) => {
     const todos = [...state.todos].map(todo => {
         if (todo.id === action.payload.id) {
             todo.completed = action.payload.completed;
+            todo.hidden = todo.completed && state.filterMode === filterActions.ACTIVE;
         }
         return todo;
     });
@@ -70,6 +73,7 @@ const todoToggleFail = (state, action) => {
 };
 
 const todoAddSuccess = (state, action) => {
+    action.payload.hidden = state.filterMode === filterActions.COMPLETED;
     return updateObject(state, {
         todos: state.todos.concat(action.payload),
         todoName: '',
@@ -119,6 +123,7 @@ const todoToggleMassSuccess = (state, action) => {
         error: null,
         todos: [...state.todos].map(todo => {
             todo.completed = action.payload;
+            todo.hidden = false;
             return todo;
         }),
         itemsLeft: state.todos.reduce((count, todo) => {
@@ -134,12 +139,41 @@ const todoToggleMassFail = (state, action) => {
     });
 };
 
+const todoFilterAction = (state, action) => {
+    return updateObject(state, {
+        todos: getTodosByMode(state.todos, action.payload),
+        filterMode: action.payload
+    });
+};
+
+const getTodosByMode = (todos, mode) => {
+    switch (mode) {
+        case filterActions.ACTIVE:
+            return todos.map(todo => {
+                todo.hidden = todo.completed;
+                return todo;
+            });
+        case filterActions.COMPLETED:
+            return todos.map(todo => {
+                todo.hidden = !todo.completed;
+                return todo;
+            });
+        case filterActions.ALL:
+        default:
+            return todos.map(todo => {
+                todo.hidden = false;
+                return todo;
+            });
+    }
+};
+
 const initialState = {
     todos: [],
     error: null,
     todoName: '',
     loading: false,
-    itemsLeft: 0
+    itemsLeft: 0,
+    filterMode: filterActions.ALL
 };
 
 const todoReducer = (state = initialState, action) => {
@@ -160,6 +194,7 @@ const todoReducer = (state = initialState, action) => {
         case actionTypes.TODO_TOGGLE_MASS_START: return todoToggleMassStart(state);
         case actionTypes.TODO_TOGGLE_MASS_SUCCESS: return todoToggleMassSuccess(state, action);
         case actionTypes.TODO_TOGGLE_MASS_FAIL: return todoToggleMassFail(state, action);
+        case actionTypes.TODO_FILTER_ACTION: return todoFilterAction(state, action);
         default: return state;
     }
 };

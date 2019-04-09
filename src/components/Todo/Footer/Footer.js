@@ -10,7 +10,7 @@ const footer = props => {
     return (
         <footer className="footer">
             <Counter count={props.uncheckedCount}/>
-            <Filters/>
+            <Filters handler={props.filterHandler} filterMode={props.filterMode}/>
             {clearBtn}
         </footer>
     );

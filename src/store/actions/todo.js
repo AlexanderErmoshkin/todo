@@ -184,3 +184,10 @@ const todoToggleMassFail = error => {
         payload: error
     };
 };
+
+export const todoFilterAction = mode => {
+    return {
+        type: actionTypes.TODO_FILTER_ACTION,
+        payload: mode
+    };
+};

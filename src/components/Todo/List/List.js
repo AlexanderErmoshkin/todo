@@ -9,6 +9,7 @@ const list = props => {
             <Item
                 id={todo.id}
                 completed={todo.completed}
+                hidden={todo.hidden}
                 name={todo.name}
                 key={todo.id}
                 toggle={props.toggleHandler}

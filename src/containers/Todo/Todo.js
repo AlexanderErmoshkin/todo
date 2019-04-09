@@ -48,31 +48,34 @@ class Todo extends Component {
         this.props.onTodoToggleMass(this.props.todos, this.props.itemsLeft > 0);
     };
 
+    todoFilterActionHandler = event => {
+        this.props.onFilterAction(event.target.dataset.mode);
+    };
+
     render() {
         const main = this.props.todos.length
             ? (
                 <React.Fragment>
                     <ToggleMass checked={this.props.itemsLeft === 0} handler={this.todoToggleMassHandler}/>
-                    <List
-                        todos={this.props.todos}
-                        toggleHandler={this.todoToggleHandler}
-                        deleteHandler={this.todoDeleteHandler}/>
+                    <List todos={this.props.todos}
+                          toggleHandler={this.todoToggleHandler}
+                          deleteHandler={this.todoDeleteHandler}/>
                 </React.Fragment>
             )
             : null;
         const footer = this.props.todos.length > 0
-            ? <Footer
-                uncheckedCount={this.props.itemsLeft}
-                checkedCount={this.props.todos.length - this.props.itemsLeft}
-                deleteCompleted={this.todoDeleteCompletedHandler} />
+            ? <Footer uncheckedCount={this.props.itemsLeft}
+                      checkedCount={this.props.todos.length - this.props.itemsLeft}
+                      deleteCompleted={this.todoDeleteCompletedHandler}
+                      filterHandler={this.todoFilterActionHandler}
+                      filterMode={this.props.filterMode} />
             : null;
         return (
             <React.Fragment>
-                <Header
-                    loading={this.props.loading}
-                    todoAdd={this.todoInputHandler}
-                    inputValue={this.props.todoName}
-                    inputChanged={this.inputChangedHandler} />
+                <Header loading={this.props.loading}
+                        todoAdd={this.todoInputHandler}
+                        inputValue={this.props.todoName}
+                        inputChanged={this.inputChangedHandler} />
                 <section className="main">
                     {main}
                 </section>
@@ -87,7 +90,8 @@ const mapStateToProps = state => {
         todos: state.todo.todos,
         todoName: state.todo.todoName,
         itemsLeft: state.todo.itemsLeft,
-        loading: state.todo.loading
+        loading: state.todo.loading,
+        filterMode: state.todo.filterMode
     };
 };
 
@@ -99,7 +103,8 @@ const mapDispatchToProps = dispatch => {
         onTodoDelete: id => dispatch(actions.todoDelete(id)),
         onTodoFetch: () => dispatch(actions.todoFetch()),
         onTodoCompletedDelete: ids => dispatch(actions.todoDeleteCompleted(ids)),
-        onTodoToggleMass: (todos, isCompleted) => dispatch(actions.todoToggleMass(todos, isCompleted))
+        onTodoToggleMass: (todos, isCompleted) => dispatch(actions.todoToggleMass(todos, isCompleted)),
+        onFilterAction: mode => dispatch(actions.todoFilterAction(mode))
     };
 };
 
