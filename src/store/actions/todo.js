@@ -3,12 +3,19 @@ import axios from '../../axios';
 
 export const todoAdd = todoName => {
     return dispatch => {
+        dispatch(todoAddStart());
         axios.post('todos.json', {name: todoName, completed: false}).then(response => {
             dispatch(todoAddSuccess(response.data.name, todoName));
         }).catch(error => {
             dispatch(todoAddFail(error));
         });
     }
+};
+
+const todoAddStart = () => {
+    return {
+        type: actionTypes.TODO_ADD_START
+    };
 };
 
 const todoAddSuccess = (id, todo) => {
@@ -189,5 +196,48 @@ export const todoFilterAction = mode => {
     return {
         type: actionTypes.TODO_FILTER_ACTION,
         payload: mode
+    };
+};
+
+export const todoEditStart = id => {
+    return {
+        type: actionTypes.TODO_EDIT_START,
+        payload: id
+    };
+};
+
+export const todoEdit = name => {
+    return {
+        type: actionTypes.TODO_EDIT,
+        payload: name
+    };
+};
+
+export const todoEditUpdate = (id, name) => {
+    return dispatch => {
+        axios.patch('todos/' + id + '.json', {name: name}).then(response => {
+            dispatch(todoEditUpdateSuccess());
+        }).catch(error => {
+            dispatch(todoEditUpdateFail(error));
+        })
+    };
+};
+
+const todoEditUpdateSuccess = () => {
+    return {
+        type: actionTypes.TODO_EDIT_UPDATE_SUCCESS
+    };
+};
+
+const todoEditUpdateFail = error => {
+    return {
+        type: actionTypes.TODO_EDIT_UPDATE_FAIL,
+        payload: error
+    };
+};
+
+export const todoEditCancel = () => {
+    return {
+        type: actionTypes.TODO_EDIT_CANCEL
     };
 };

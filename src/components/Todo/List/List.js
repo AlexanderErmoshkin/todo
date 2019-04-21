@@ -10,10 +10,15 @@ const list = props => {
                 id={todo.id}
                 completed={todo.completed}
                 hidden={todo.hidden}
-                name={todo.name}
+                name={props.editId === todo.id ? props.editName : todo.name}
                 key={todo.id}
                 toggle={props.toggleHandler}
-                delete={props.deleteHandler}/>
+                delete={props.deleteHandler}
+                doubleClicked={props.doubleClicked}
+                nameChanged={props.nameChanged}
+                focusLost={props.focusLost}
+                keyDown={props.keyDown}
+                editing={props.editId === todo.id} />
     )}
 
     return (

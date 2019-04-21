@@ -12,12 +12,11 @@ import ToggleMass from '../../components/Todo/ToggleMass/ToggleMass';
 class Todo extends Component {
 
     componentDidMount() {
-        console.log('[Todo] componentDidMount');
         this.props.onTodoFetch();
     }
 
     todoInputHandler = event => {
-        if (event.keyCode === 13 && this.props.todoName !== '') {
+        if (event.keyCode === 13 && this.props.todoName && !this.props.submitted) {
             this.props.onTodoAdd(event.target.value);
         }
     };
@@ -52,6 +51,45 @@ class Todo extends Component {
         this.props.onFilterAction(event.target.dataset.mode);
     };
 
+    todoEditStartHandler = event => {
+        this.props.onTodoEditStart(event.target.dataset.id);
+    };
+
+    todoNameEditHandler = event => {
+        this.props.onTodoEdit(event.target.value);
+    };
+
+    todoEditUpdateHandler = () => {
+        if (!this.props.editId || !this.props.editName) {
+            return;
+        }
+        const currentName = this.props.todos.reduce((_, todo) => {
+            if (this.props.editId === todo.id) {
+                return todo.name;
+            }
+        });
+        if (currentName !== this.props.editName) {
+            this.props.onTodoEditUpdate(this.props.editId, this.props.editName);
+        }
+    };
+
+    todoEditUpdateSubmitHandler = event => {
+        const currentName = this.props.todos.reduce((_, todo) => {
+            if (this.props.editId === todo.id) {
+                return todo.name;
+            }
+        });
+        if (event.keyCode === 13) {
+            if (currentName === this.props.editName) {
+                this.props.onTodoEditCancel();
+            } else {
+                this.props.onTodoEditUpdate(this.props.editId, this.props.editName);
+            }
+        } else if (event.keyCode === 27) {
+            this.props.onTodoEditCancel();
+        }
+    };
+
     render() {
         const main = this.props.todos.length
             ? (
@@ -59,7 +97,13 @@ class Todo extends Component {
                     <ToggleMass checked={this.props.itemsLeft === 0} handler={this.todoToggleMassHandler}/>
                     <List todos={this.props.todos}
                           toggleHandler={this.todoToggleHandler}
-                          deleteHandler={this.todoDeleteHandler}/>
+                          deleteHandler={this.todoDeleteHandler}
+                          doubleClicked={this.todoEditStartHandler}
+                          nameChanged={this.todoNameEditHandler}
+                          focusLost={this.todoEditUpdateHandler}
+                          keyDown={this.todoEditUpdateSubmitHandler}
+                          editName={this.props.editName}
+                          editId={this.props.editId}/>
                 </React.Fragment>
             )
             : null;
@@ -72,8 +116,8 @@ class Todo extends Component {
             : null;
         return (
             <React.Fragment>
-                <Header loading={this.props.loading}
-                        todoAdd={this.todoInputHandler}
+                <Header todoAdd={this.todoInputHandler}
+                        editing={!this.props.editId}
                         inputValue={this.props.todoName}
                         inputChanged={this.inputChangedHandler} />
                 <section className="main">
@@ -90,8 +134,10 @@ const mapStateToProps = state => {
         todos: state.todo.todos,
         todoName: state.todo.todoName,
         itemsLeft: state.todo.itemsLeft,
-        loading: state.todo.loading,
-        filterMode: state.todo.filterMode
+        filterMode: state.todo.filterMode,
+        submitted: state.todo.submitted,
+        editId: state.todo.editId,
+        editName: state.todo.editName
     };
 };
 
@@ -104,7 +150,11 @@ const mapDispatchToProps = dispatch => {
         onTodoFetch: () => dispatch(actions.todoFetch()),
         onTodoCompletedDelete: ids => dispatch(actions.todoDeleteCompleted(ids)),
         onTodoToggleMass: (todos, isCompleted) => dispatch(actions.todoToggleMass(todos, isCompleted)),
-        onFilterAction: mode => dispatch(actions.todoFilterAction(mode))
+        onFilterAction: mode => dispatch(actions.todoFilterAction(mode)),
+        onTodoEditStart: id => dispatch(actions.todoEditStart(id)),
+        onTodoEdit: name => dispatch(actions.todoEdit(name)),
+        onTodoEditUpdate: (id, name) => dispatch(actions.todoEditUpdate(id, name)),
+        onTodoEditCancel: () => dispatch(actions.todoEditCancel()),
     };
 };
 

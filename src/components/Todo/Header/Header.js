@@ -8,10 +8,9 @@ const header = props => (
         <Input
             className="new-todo"
             placeHolder="What needs to be done?"
-            autoFocus
+            editing={props.editing}
             value={props.inputValue}
-            disabled={props.loading}
-            todoAdd={props.todoAdd}
+            keyDown={props.todoAdd}
             changed={props.inputChanged} />
     </header>
 );

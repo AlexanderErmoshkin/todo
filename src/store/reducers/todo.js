@@ -72,19 +72,29 @@ const todoToggleFail = (state, action) => {
     });
 };
 
+const todoAddStart = state => {
+    return updateObject(state, {
+        loading: true,
+        submitted: true
+    });
+};
+
 const todoAddSuccess = (state, action) => {
     action.payload.hidden = state.filterMode === filterActions.COMPLETED;
     return updateObject(state, {
         todos: state.todos.concat(action.payload),
         todoName: '',
-        itemsLeft: state.itemsLeft + 1
+        itemsLeft: state.itemsLeft + 1,
+        loading: false,
+        submitted: false
     })
 };
 
 const todoAddFail = (state, action) => {
     return updateObject(state, {
         error: action.payload,
-        loading: false
+        loading: false,
+        submitted: false
     });
 };
 
@@ -167,17 +177,62 @@ const getTodosByMode = (todos, mode) => {
     }
 };
 
+const todoEditStart = (state, action) => {
+    console.log(332)
+    return updateObject(state, {
+        editId: action.payload,
+        editName: state.todos.reduce((_, todo) => {
+            if (todo.id === action.payload) {
+                return todo.name;
+            }
+        }, '')
+    });
+};
+
+const todoEdit = (state, action) => {
+    return updateObject(state, {editName: action.payload});
+};
+
+const todoEditUpdateSuccess = (state, action) => {
+    return updateObject(state, {
+        todos: [...state.todos].map(todo => todo.id === state.editId
+            ? updateObject(todo, {name: state.editName})
+            : todo),
+        editName: '',
+        editId: null
+    });
+};
+
+const todoEditUpdateFail = (state, action) => {
+    return updateObject(state, {
+        error: action.payload,
+        editId: null,
+        editName: ''
+    });
+};
+
+const todoEditCancel = (state, action) => {
+    return updateObject(state, {
+        editName: '',
+        editId: null
+    });
+};
+
 const initialState = {
     todos: [],
     error: null,
     todoName: '',
+    submitted: false,
     loading: false,
     itemsLeft: 0,
-    filterMode: filterActions.ALL
+    filterMode: filterActions.ALL,
+    editId: null,
+    editName: ''
 };
 
 const todoReducer = (state = initialState, action) => {
     switch (action.type) {
+        case actionTypes.TODO_ADD_START: return todoAddStart(state);
         case actionTypes.TODO_ADD_SUCCESS: return todoAddSuccess(state, action);
         case actionTypes.TODO_ADD_FAIL: return todoAddFail(state, action);
         case actionTypes.TODO_NAME_CHANGED: return todoNameChanged(state, action);
@@ -195,6 +250,11 @@ const todoReducer = (state = initialState, action) => {
         case actionTypes.TODO_TOGGLE_MASS_SUCCESS: return todoToggleMassSuccess(state, action);
         case actionTypes.TODO_TOGGLE_MASS_FAIL: return todoToggleMassFail(state, action);
         case actionTypes.TODO_FILTER_ACTION: return todoFilterAction(state, action);
+        case actionTypes.TODO_EDIT_START: return todoEditStart(state, action);
+        case actionTypes.TODO_EDIT: return todoEdit(state, action);
+        case actionTypes.TODO_EDIT_UPDATE_SUCCESS: return todoEditUpdateSuccess(state, action);
+        case actionTypes.TODO_EDIT_UPDATE_FAIL: return todoEditUpdateFail(state, action);
+        case actionTypes.TODO_EDIT_CANCEL: return todoEditCancel(state, action);
         default: return state;
     }
 };

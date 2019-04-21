@@ -1,15 +1,33 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-const input = props => (
-    <input
-        className={props.className}
-        placeholder={props.placeHolder}
-        autoFocus={props.autoFocus}
-        onKeyDown={props.todoAdd}
-        value={props.value}
-        onChange={props.changed}
-        disabled={props.disabled}
-    />
-);
+class Input extends Component {
+    constructor(props) {
+        super(props);
+        this.ref = React.createRef();
+    }
 
-export default input;
+    componentDidUpdate() {
+        if (this.props.editing) {
+            this.ref.current.focus();
+        }
+    }
+
+    render() {
+        return (
+            <input
+                ref={this.ref}
+                type="text"
+                className={this.props.className}
+                placeholder={this.props.placeHolder}
+                onKeyDown={this.props.keyDown}
+                value={this.props.value}
+                onChange={this.props.changed}
+                disabled={this.props.disabled}
+                onBlur={this.props.focusLost}
+                data-id={this.props.dataId}
+            />
+        );
+    }
+}
+
+export default Input;

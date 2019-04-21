@@ -2,6 +2,7 @@ export const TODO_FETCH_START = 'TODO_FETCH_START';
 export const TODO_FETCH_SUCCESS = 'TODO_FETCH_SUCCESS';
 export const TODO_FETCH_FAIL = 'TODO_FETCH_FAIL';
 
+export const TODO_ADD_START = 'TODO_ADD_START';
 export const TODO_ADD_SUCCESS = 'TODO_ADD_SUCCESS';
 export const TODO_ADD_FAIL = 'TODO_ADD_FAIL';
 
@@ -27,3 +28,9 @@ export const filterActions = {
     ACTIVE: 'ACTIVE',
     COMPLETED: 'COMPLETED'
 };
+
+export const TODO_EDIT_START = 'TODO_EDIT_START';
+export const TODO_EDIT = 'TODO_EDIT';
+export const TODO_EDIT_CANCEL = 'TODO_EDIT_CANCEL';
+export const TODO_EDIT_UPDATE_SUCCESS = 'TODO_EDIT_UPDATE_SUCCESS';
+export const TODO_EDIT_UPDATE_FAIL = 'TODO_EDIT_UPDATE_FAIL';
