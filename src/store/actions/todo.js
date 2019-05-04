@@ -206,10 +206,13 @@ export const todoEditStart = id => {
     };
 };
 
-export const todoEdit = name => {
+export const todoEdit = (name, itemsLeft) => {
     return {
         type: actionTypes.TODO_EDIT,
-        payload: name
+        payload: {
+            name: name,
+            itemsLeft: itemsLeft
+        }
     };
 };
 
@@ -236,8 +239,9 @@ const todoEditUpdateFail = error => {
     };
 };
 
-export const todoEditCancel = () => {
+export const todoEditCancel = itemsLeft => {
     return {
-        type: actionTypes.TODO_EDIT_CANCEL
+        type: actionTypes.TODO_EDIT_CANCEL,
+        payload: itemsLeft
     };
 };

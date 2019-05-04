@@ -8,6 +8,7 @@ import * as actions from '../../store/actions/index';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../axios';
 import ToggleMass from '../../components/Todo/ToggleMass/ToggleMass';
+import { getIncompleteCount, getTodoById} from '../../util';
 
 class Todo extends Component {
 
@@ -56,11 +57,19 @@ class Todo extends Component {
     };
 
     todoNameEditHandler = event => {
-        this.props.onTodoEdit(event.target.value);
+        let itemsLeft = this.props.itemsLeft;
+        if (event.target.value === ''
+            && !getTodoById(this.props.todos, event.target.dataset.id).completed
+            && this.props.itemsLeft === getIncompleteCount(this.props.todos)
+        ) {
+            itemsLeft = this.props.itemsLeft - 1;
+        }
+        this.props.onTodoEdit(event.target.value, itemsLeft);
     };
 
     todoEditUpdateHandler = () => {
         if (!this.props.editId || !this.props.editName) {
+            this.props.onTodoEditCancel(getIncompleteCount(this.props.todos));
             return;
         }
         const currentName = this.props.todos.reduce((_, todo) => {
@@ -70,6 +79,8 @@ class Todo extends Component {
         });
         if (currentName !== this.props.editName) {
             this.props.onTodoEditUpdate(this.props.editId, this.props.editName);
+        } else {
+            this.props.onTodoEditCancel(getIncompleteCount(this.props.todos));
         }
     };
 
@@ -81,12 +92,14 @@ class Todo extends Component {
         });
         if (event.keyCode === 13) {
             if (currentName === this.props.editName) {
-                this.props.onTodoEditCancel();
+                this.props.onTodoEditCancel(getIncompleteCount(this.props.todos));
+            } else if (this.props.editName === '') {
+                this.props.onTodoDelete(this.props.editId);
             } else {
                 this.props.onTodoEditUpdate(this.props.editId, this.props.editName);
             }
         } else if (event.keyCode === 27) {
-            this.props.onTodoEditCancel();
+            this.props.onTodoEditCancel(getIncompleteCount(this.props.todos));
         }
     };
 
@@ -152,9 +165,9 @@ const mapDispatchToProps = dispatch => {
         onTodoToggleMass: (todos, isCompleted) => dispatch(actions.todoToggleMass(todos, isCompleted)),
         onFilterAction: mode => dispatch(actions.todoFilterAction(mode)),
         onTodoEditStart: id => dispatch(actions.todoEditStart(id)),
-        onTodoEdit: name => dispatch(actions.todoEdit(name)),
+        onTodoEdit: (name, itemsLeft) => dispatch(actions.todoEdit(name, itemsLeft)),
         onTodoEditUpdate: (id, name) => dispatch(actions.todoEditUpdate(id, name)),
-        onTodoEditCancel: () => dispatch(actions.todoEditCancel()),
+        onTodoEditCancel: itemsLeft => dispatch(actions.todoEditCancel(itemsLeft)),
     };
 };
 

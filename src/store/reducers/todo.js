@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
-import { updateObject } from "../../util";
+import { updateObject, getTodoById } from "../../util";
 import {filterActions} from "../actions/actionTypes";
 
 const todoFetchStart = state => {
@@ -32,12 +32,13 @@ const todoFetchFail = (state, action) => {
 };
 
 const todoDeleteSuccess = (state, action) => {
+    const todo = getTodoById(state.todos, action.payload);
     return updateObject(state, {
         error: null,
         todos: [...state.todos].filter(todo => {
             return todo.id !== action.payload;
         }),
-        itemsLeft: state.itemsLeft - 1
+        itemsLeft: todo.completed ? state.itemsLeft : state.itemsLeft - 1
     })
 };
 
@@ -178,7 +179,6 @@ const getTodosByMode = (todos, mode) => {
 };
 
 const todoEditStart = (state, action) => {
-    console.log(332)
     return updateObject(state, {
         editId: action.payload,
         editName: state.todos.reduce((_, todo) => {
@@ -190,7 +190,10 @@ const todoEditStart = (state, action) => {
 };
 
 const todoEdit = (state, action) => {
-    return updateObject(state, {editName: action.payload});
+    return updateObject(state, {
+        editName: action.payload.name,
+        itemsLeft: action.payload.itemsLeft
+    });
 };
 
 const todoEditUpdateSuccess = (state, action) => {
@@ -214,7 +217,8 @@ const todoEditUpdateFail = (state, action) => {
 const todoEditCancel = (state, action) => {
     return updateObject(state, {
         editName: '',
-        editId: null
+        editId: null,
+        itemsLeft: action.payload
     });
 };
 
